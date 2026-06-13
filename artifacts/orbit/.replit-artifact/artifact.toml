@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "ORBIT — Autonomous Hiring OS"
+version = "1.0.0"
+id = "artifacts/orbit"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 22982
+
+[services.development]
+run = "pnpm --filter @workspace/orbit run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/orbit", "run", "build" ]
+publicDir = "artifacts/orbit/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "22982"
+BASE_PATH = "/"

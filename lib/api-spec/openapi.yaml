@@ -1,22 +1,28 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: ORBIT Autonomous Hiring OS API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: candidates
+  - name: jobs
+  - name: pipeline
+  - name: simulations
+  - name: debates
+  - name: chemistry
+  - name: autopilot
+  - name: analytics
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +30,443 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /candidates:
+    get:
+      operationId: listCandidates
+      tags: [candidates]
+      summary: List all candidates
+      parameters:
+        - in: query
+          name: jobId
+          schema:
+            type: ["integer", "null"]
+        - in: query
+          name: stage
+          schema:
+            type: ["string", "null"]
+        - in: query
+          name: search
+          schema:
+            type: ["string", "null"]
+      responses:
+        "200":
+          description: List of candidates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Candidate"
+    post:
+      operationId: createCandidate
+      tags: [candidates]
+      summary: Create a candidate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CandidateInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Candidate"
+
+  /candidates/{id}:
+    get:
+      operationId: getCandidate
+      tags: [candidates]
+      summary: Get a candidate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Candidate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Candidate"
+    patch:
+      operationId: updateCandidate
+      tags: [candidates]
+      summary: Update a candidate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CandidateUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Candidate"
+    delete:
+      operationId: deleteCandidate
+      tags: [candidates]
+      summary: Delete a candidate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  /candidates/{id}/twin:
+    get:
+      operationId: getCandidateTwin
+      tags: [candidates]
+      summary: Get digital twin for a candidate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Digital twin data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CandidateTwin"
+
+  /candidates/{id}/simulation:
+    get:
+      operationId: getCandidateSimulation
+      tags: [candidates]
+      summary: Get performance simulation for a candidate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Simulation results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PerformanceSimulation"
+
+  /jobs:
+    get:
+      operationId: listJobs
+      tags: [jobs]
+      summary: List all job roles
+      responses:
+        "200":
+          description: Jobs list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+    post:
+      operationId: createJob
+      tags: [jobs]
+      summary: Create a job role
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+
+  /jobs/{id}:
+    get:
+      operationId: getJob
+      tags: [jobs]
+      summary: Get a job role
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+    patch:
+      operationId: updateJob
+      tags: [jobs]
+      summary: Update a job role
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+
+  /pipeline:
+    get:
+      operationId: getPipeline
+      tags: [pipeline]
+      summary: Get full pipeline with stage counts
+      responses:
+        "200":
+          description: Pipeline summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PipelineSummary"
+
+  /pipeline/move:
+    post:
+      operationId: moveCandidate
+      tags: [pipeline]
+      summary: Move a candidate to a different stage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PipelineMove"
+      responses:
+        "200":
+          description: Updated candidate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Candidate"
+
+  /debates:
+    get:
+      operationId: listDebates
+      tags: [debates]
+      summary: List all AI debates
+      responses:
+        "200":
+          description: Debates list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Debate"
+    post:
+      operationId: createDebate
+      tags: [debates]
+      summary: Trigger an AI debate for a candidate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DebateInput"
+      responses:
+        "201":
+          description: Created debate
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Debate"
+
+  /debates/{id}:
+    get:
+      operationId: getDebate
+      tags: [debates]
+      summary: Get a specific debate
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Debate detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Debate"
+
+  /chemistry:
+    get:
+      operationId: getTeamChemistry
+      tags: [chemistry]
+      summary: Get current team chemistry analysis
+      responses:
+        "200":
+          description: Team chemistry data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamChemistry"
+
+  /chemistry/preview:
+    post:
+      operationId: previewChemistry
+      tags: [chemistry]
+      summary: Preview team chemistry after adding a candidate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChemistryPreviewInput"
+      responses:
+        "200":
+          description: Chemistry preview
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamChemistryPreview"
+
+  /autopilot/missions:
+    get:
+      operationId: listMissions
+      tags: [autopilot]
+      summary: List all autopilot missions
+      responses:
+        "200":
+          description: Missions list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Mission"
+    post:
+      operationId: launchMission
+      tags: [autopilot]
+      summary: Launch an autonomous hiring mission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MissionInput"
+      responses:
+        "201":
+          description: Mission launched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Mission"
+
+  /autopilot/missions/{id}:
+    get:
+      operationId: getMission
+      tags: [autopilot]
+      summary: Get a mission's status
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Mission
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Mission"
+
+  /analytics/dashboard:
+    get:
+      operationId: getDashboardAnalytics
+      tags: [analytics]
+      summary: Get dashboard summary analytics
+      responses:
+        "200":
+          description: Dashboard analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardAnalytics"
+
+  /analytics/hiring-funnel:
+    get:
+      operationId: getHiringFunnel
+      tags: [analytics]
+      summary: Get hiring funnel data
+      responses:
+        "200":
+          description: Funnel data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/FunnelStage"
+
+  /analytics/agent-activity:
+    get:
+      operationId: getAgentActivity
+      tags: [analytics]
+      summary: Get live agent activity feed
+      responses:
+        "200":
+          description: Agent activity events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentActivity"
+
+  /analytics/hidden-talents:
+    get:
+      operationId: getHiddenTalents
+      tags: [analytics]
+      summary: Get candidates identified as hidden talents
+      responses:
+        "200":
+          description: Hidden talent candidates
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Candidate"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +474,613 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    SkillScore:
+      type: object
+      properties:
+        skill:
+          type: string
+        score:
+          type: number
+        category:
+          type: string
+      required: [skill, score, category]
+
+    Candidate:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        jobId:
+          type: ["integer", "null"]
+        stage:
+          type: string
+        overallScore:
+          type: number
+        technicalScore:
+          type: number
+        cultureScore:
+          type: number
+        growthScore:
+          type: number
+        retentionProbability:
+          type: number
+        hiddenTalent:
+          type: boolean
+        verdict:
+          type: ["string", "null"]
+        avatarInitials:
+          type: string
+        location:
+          type: string
+        yearsExperience:
+          type: number
+        currentCompany:
+          type: string
+        skills:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillScore"
+        summary:
+          type: string
+        githubActivity:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - email
+        - role
+        - stage
+        - overallScore
+        - technicalScore
+        - cultureScore
+        - growthScore
+        - retentionProbability
+        - hiddenTalent
+        - avatarInitials
+        - location
+        - yearsExperience
+        - currentCompany
+        - skills
+        - summary
+        - githubActivity
+        - createdAt
+
+    CandidateInput:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+        jobId:
+          type: ["integer", "null"]
+        location:
+          type: string
+        yearsExperience:
+          type: number
+        currentCompany:
+          type: string
+        summary:
+          type: string
+      required: [name, email, role]
+
+    CandidateUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        stage:
+          type: string
+        verdict:
+          type: string
+
+    CandidateTwin:
+      type: object
+      properties:
+        candidateId:
+          type: integer
+        skillDna:
+          type: array
+          items:
+            $ref: "#/components/schemas/SkillScore"
+        learningVelocity:
+          type: number
+        leadershipPotential:
+          type: number
+        adaptabilityScore:
+          type: number
+        communicationScore:
+          type: number
+        careerGoals:
+          type: string
+        growthTrajectory:
+          type: string
+        strengths:
+          type: array
+          items:
+            type: string
+        weaknesses:
+          type: array
+          items:
+            type: string
+        futureSuccessPrediction:
+          type: number
+        retentionForecast:
+          type: number
+        promotionTimeline:
+          type: string
+      required:
+        - candidateId
+        - skillDna
+        - learningVelocity
+        - leadershipPotential
+        - adaptabilityScore
+        - communicationScore
+        - careerGoals
+        - growthTrajectory
+        - strengths
+        - weaknesses
+        - futureSuccessPrediction
+        - retentionForecast
+        - promotionTimeline
+
+    PerformancePoint:
+      type: object
+      properties:
+        month:
+          type: string
+        performance:
+          type: number
+        productivity:
+          type: number
+        teamImpact:
+          type: number
+      required: [month, performance, productivity, teamImpact]
+
+    PerformanceSimulation:
+      type: object
+      properties:
+        candidateId:
+          type: integer
+        threeMonthScore:
+          type: number
+        sixMonthScore:
+          type: number
+        twelveMonthScore:
+          type: number
+        promotionPotential:
+          type: number
+        leadershipDevelopment:
+          type: number
+        teamInfluence:
+          type: number
+        learningProgression:
+          type: number
+        forecast:
+          type: array
+          items:
+            $ref: "#/components/schemas/PerformancePoint"
+        summary:
+          type: string
+      required:
+        - candidateId
+        - threeMonthScore
+        - sixMonthScore
+        - twelveMonthScore
+        - promotionPotential
+        - leadershipDevelopment
+        - teamInfluence
+        - learningProgression
+        - forecast
+        - summary
+
+    Job:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        description:
+          type: string
+        requirements:
+          type: array
+          items:
+            type: string
+        candidateCount:
+          type: integer
+        status:
+          type: string
+        createdAt:
+          type: string
+      required: [id, title, department, location, description, requirements, candidateCount, status, createdAt]
+
+    JobInput:
+      type: object
+      properties:
+        title:
+          type: string
+        department:
+          type: string
+        location:
+          type: string
+        description:
+          type: string
+        requirements:
+          type: array
+          items:
+            type: string
+      required: [title, department, location, description]
+
+    JobUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+        status:
+          type: string
+        description:
+          type: string
+
+    PipelineStageSummary:
+      type: object
+      properties:
+        stage:
+          type: string
+        label:
+          type: string
+        count:
+          type: integer
+        candidates:
+          type: array
+          items:
+            $ref: "#/components/schemas/Candidate"
+      required: [stage, label, count, candidates]
+
+    PipelineSummary:
+      type: object
+      properties:
+        stages:
+          type: array
+          items:
+            $ref: "#/components/schemas/PipelineStageSummary"
+        totalCandidates:
+          type: integer
+        activeJobs:
+          type: integer
+      required: [stages, totalCandidates, activeJobs]
+
+    PipelineMove:
+      type: object
+      properties:
+        candidateId:
+          type: integer
+        stage:
+          type: string
+      required: [candidateId, stage]
+
+    DebateMessage:
+      type: object
+      properties:
+        agent:
+          type: string
+        agentType:
+          type: string
+        message:
+          type: string
+        stance:
+          type: string
+        evidence:
+          type: array
+          items:
+            type: string
+        timestamp:
+          type: string
+      required: [agent, agentType, message, stance, timestamp, evidence]
+
+    Debate:
+      type: object
+      properties:
+        id:
+          type: integer
+        candidateId:
+          type: integer
+        candidateName:
+          type: string
+        jobTitle:
+          type: string
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/DebateMessage"
+        verdict:
+          type: string
+        confidenceScore:
+          type: number
+        technicalScore:
+          type: number
+        cultureScore:
+          type: number
+        growthScore:
+          type: number
+        riskScore:
+          type: number
+        summary:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - candidateId
+        - candidateName
+        - jobTitle
+        - messages
+        - verdict
+        - confidenceScore
+        - technicalScore
+        - cultureScore
+        - growthScore
+        - riskScore
+        - summary
+        - status
+        - createdAt
+
+    DebateInput:
+      type: object
+      properties:
+        candidateId:
+          type: integer
+        jobId:
+          type: ["integer", "null"]
+      required: [candidateId]
+
+    TeamMember:
+      type: object
+      properties:
+        name:
+          type: string
+        role:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        leadershipStyle:
+          type: string
+      required: [name, role, skills, leadershipStyle]
+
+    ChemistryDimension:
+      type: object
+      properties:
+        dimension:
+          type: string
+        score:
+          type: number
+        description:
+          type: string
+      required: [dimension, score, description]
+
+    TeamChemistry:
+      type: object
+      properties:
+        overallScore:
+          type: number
+        skillComplementarity:
+          type: number
+        leadershipBalance:
+          type: number
+        communicationCompatibility:
+          type: number
+        teamSynergy:
+          type: number
+        collaborationPotential:
+          type: number
+        dimensions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChemistryDimension"
+        members:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeamMember"
+        insights:
+          type: array
+          items:
+            type: string
+      required:
+        - overallScore
+        - skillComplementarity
+        - leadershipBalance
+        - communicationCompatibility
+        - teamSynergy
+        - collaborationPotential
+        - dimensions
+        - members
+        - insights
+
+    TeamChemistryPreview:
+      type: object
+      properties:
+        currentScore:
+          type: number
+        projectedScore:
+          type: number
+        delta:
+          type: number
+        improvements:
+          type: array
+          items:
+            type: string
+        risks:
+          type: array
+          items:
+            type: string
+        recommendation:
+          type: string
+      required: [currentScore, projectedScore, delta, improvements, risks, recommendation]
+
+    ChemistryPreviewInput:
+      type: object
+      properties:
+        candidateId:
+          type: integer
+      required: [candidateId]
+
+    MissionStep:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        status:
+          type: string
+        startedAt:
+          type: ["string", "null"]
+        completedAt:
+          type: ["string", "null"]
+        details:
+          type: ["string", "null"]
+      required: [id, label, status]
+
+    Mission:
+      type: object
+      properties:
+        id:
+          type: integer
+        jobId:
+          type: ["integer", "null"]
+        jobTitle:
+          type: string
+        status:
+          type: string
+        steps:
+          type: array
+          items:
+            $ref: "#/components/schemas/MissionStep"
+        candidatesDiscovered:
+          type: integer
+        hiddenTalentsFound:
+          type: integer
+        debatesRun:
+          type: integer
+        topCandidateId:
+          type: ["integer", "null"]
+        topCandidateName:
+          type: ["string", "null"]
+        startedAt:
+          type: string
+        completedAt:
+          type: ["string", "null"]
+      required:
+        - id
+        - jobTitle
+        - status
+        - steps
+        - candidatesDiscovered
+        - hiddenTalentsFound
+        - debatesRun
+        - startedAt
+
+    MissionInput:
+      type: object
+      properties:
+        jobId:
+          type: ["integer", "null"]
+        jobTitle:
+          type: string
+      required: [jobTitle]
+
+    DashboardAnalytics:
+      type: object
+      properties:
+        totalCandidates:
+          type: integer
+        activeJobs:
+          type: integer
+        hiddenTalentsFound:
+          type: integer
+        activeAgents:
+          type: integer
+        debatesCompleted:
+          type: integer
+        avgMatchScore:
+          type: number
+        timeToHireReduction:
+          type: number
+        topCandidate:
+          $ref: "#/components/schemas/Candidate"
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentActivity"
+        hiringVelocity:
+          type: array
+          items:
+            type: object
+            properties:
+              week:
+                type: string
+              candidates:
+                type: integer
+              offers:
+                type: integer
+            required: [week, candidates, offers]
+      required:
+        - totalCandidates
+        - activeJobs
+        - hiddenTalentsFound
+        - activeAgents
+        - debatesCompleted
+        - avgMatchScore
+        - timeToHireReduction
+        - recentActivity
+        - hiringVelocity
+
+    FunnelStage:
+      type: object
+      properties:
+        stage:
+          type: string
+        count:
+          type: integer
+        conversionRate:
+          type: number
+      required: [stage, count, conversionRate]
+
+    AgentActivity:
+      type: object
+      properties:
+        id:
+          type: string
+        agent:
+          type: string
+        agentType:
+          type: string
+        action:
+          type: string
+        target:
+          type: string
+        timestamp:
+          type: string
+        status:
+          type: string
+      required: [id, agent, agentType, action, target, timestamp, status]
